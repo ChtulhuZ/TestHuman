@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CloseIcon } from './icons/CloseIcon';
@@ -9,7 +8,6 @@ interface SurveyWidgetProps {
     onClose: () => void;
 }
 
-// FIX: Added `as const` to `ease` properties to fix framer-motion typing issue.
 const widgetVariants = {
     hidden: { opacity: 0, x: -30, scale: 0.95 },
     visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },

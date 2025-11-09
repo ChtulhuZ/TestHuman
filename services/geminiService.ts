@@ -4,7 +4,7 @@ import { ChatMessage } from '../types';
 const API_KEY = process.env.API_KEY;
 
 if (!API_KEY) {
-    throw new Error("API_KEY environment variable is not set");
+    console.warn("API_KEY environment variable not set. Gemini API calls will fail.");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -40,7 +40,7 @@ export const getChatResponse = async (history: ChatMessage[], newMessage: string
 };
 
 const gridToString = (grid: boolean[][]): string => {
-    return grid.map(row => row.map(cell => (cell ? 'X' : 'O')).join(' ')).join('\n');
+    return grid.map(row => row.map(cell => (cell ? 'X' : 'O')).join(' ')).join('\\n');
 };
 
 export const solvePuzzle = async (grid: boolean[][]): Promise<{ row: number, col: number }[]> => {

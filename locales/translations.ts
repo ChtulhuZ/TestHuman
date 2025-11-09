@@ -1,4 +1,3 @@
-
 export type Locale = 'it' | 'en' | 'de' | 'fr' | 'ru';
 
 export interface Language {

@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CloseIcon } from './icons/CloseIcon';
@@ -24,7 +22,6 @@ const useMediaQuery = (query: string): boolean => {
     return matches;
 };
 
-// FIX: Added `as const` to `ease` properties to fix framer-motion typing issue.
 const windowVariants = {
     hidden: { opacity: 0, scale: 0.9, y: 20 },
     visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] as const } },
@@ -37,7 +34,6 @@ const mobileBackdropVariants = {
     exit: { opacity: 0 },
 };
 
-// FIX: Added `as const` to `ease` properties to fix framer-motion typing issue.
 const mobileWindowVariants = {
     hidden: { y: "100%" },
     visible: { y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
@@ -105,12 +101,6 @@ const Window: React.FC<WindowProps> = ({ children, title, onClose, className = '
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {children}
             </div>
-             <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
-            `}</style>
         </motion.div>
     );
 };

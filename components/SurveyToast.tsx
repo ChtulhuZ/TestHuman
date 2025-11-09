@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -7,7 +6,6 @@ interface SurveyToastProps {
     onDismiss: () => void;
 }
 
-// FIX: Added `as const` to `ease` properties to fix framer-motion typing issue.
 const toastVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },

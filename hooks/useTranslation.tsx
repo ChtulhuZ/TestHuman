@@ -1,5 +1,3 @@
-
-
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { translations, Language, Locale } from '../locales/translations';
 
@@ -12,13 +10,12 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // FIX: Use useState to allow changing the locale.
     const [locale, setLocale] = useState<Locale>('en'); 
     
     const value = useMemo(() => ({
         locale,
         translations: translations[locale],
-        setLocale // FIX: Provide setLocale to consumers of the context.
+        setLocale
     }), [locale]);
 
     return (
