@@ -11,7 +11,6 @@
   "dependencies": {
     "react": "^19.2.0",
     "@google/genai": "^1.29.0",
-    "framer-motion": "^11.3.11",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.5"
   },

@@ -28,6 +28,22 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+
+        /* Animation Styles */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes scaleOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+        @keyframes slideInMessage { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes pulse-border { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 0, 0.7); } 50% { box-shadow: 0 0 0 4px rgba(255, 255, 0, 0); } }
+        
+        .anim-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .anim-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+        .anim-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .anim-scale-out { animation: scaleOut 0.2s ease-out forwards; }
+        .anim-slide-in-message { animation: slideInMessage 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .anim-pulse-border { animation: pulse-border 1.5s ease-out infinite; }
     </style>
 <script type="importmap">
 {
@@ -35,7 +51,6 @@
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.3.11",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.5"

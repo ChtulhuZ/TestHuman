@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import Certification from './components/Certification';
 import DesktopHub from './components/DesktopHub';
 
@@ -32,15 +31,13 @@ const App: React.FC = () => {
                     <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-cyan-400 opacity-20 blur-[100px]"></div>
                 </div>
                 <main className="h-screen w-screen">
-                     <AnimatePresence mode="wait">
-                        {isLoading ? (
-                            <div key="loader" className="w-full h-full flex items-center justify-center"></div>
-                        ) : isCertified ? (
-                           <DesktopHub key="hub" />
-                        ) : (
-                           <Certification key="certification" onCertified={handleCertification} />
-                        )}
-                    </AnimatePresence>
+                    {isLoading ? (
+                        <div key="loader" className="w-full h-full flex items-center justify-center"></div>
+                    ) : isCertified ? (
+                       <DesktopHub key="hub" />
+                    ) : (
+                       <Certification key="certification" onCertified={handleCertification} />
+                    )}
                 </main>
             </div>
         </div>

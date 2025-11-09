@@ -2,35 +2,16 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowRightIcon } from './icons/ArrowRightIcon';
 import { useTranslation } from '../hooks/useTranslation';
 
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-            delayChildren: 0.2,
-        }
-    }
-};
-
-// FIX: Added `as const` to `ease` property to fix framer-motion typing issue.
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }
-  }
-};
-
-const ExperienceCard: React.FC<{ to: string; title: string; description: string }> = ({ to, title, description }) => {
+const ExperienceCard: React.FC<{ to: string; title: string; description: string; delay: number }> = ({ to, title, description, delay }) => {
     const { t } = useTranslation();
     return (
-        <motion.div variants={cardVariants} whileHover={{ y: -8, scale: 1.03 }} transition={{ type: 'spring', stiffness: 300 }}>
+        <div 
+            className="transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.03] anim-fade-in-up"
+            style={{ animationDelay: `${delay}s`}}
+        >
             <Link 
                 to={to}
                 className="block p-8 bg-slate-800/40 border border-slate-700/50 rounded-xl backdrop-blur-sm h-full flex flex-col group"
@@ -42,40 +23,36 @@ const ExperienceCard: React.FC<{ to: string; title: string; description: string 
                     <ArrowRightIcon className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" />
                 </div>
             </Link>
-        </motion.div>
+        </div>
     );
 };
 
 const Hub: React.FC = () => {
     const { t } = useTranslation();
     return (
-        <motion.div 
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={containerVariants}
-        >
-            <motion.div variants={cardVariants} className="text-center max-w-2xl mx-auto mb-12">
+        <div className="anim-fade-in">
+            <div className="text-center max-w-2xl mx-auto mb-12 anim-fade-in-up" style={{ animationDelay: '0.1s'}}>
                 <h1 className="text-4xl md:text-5xl font-bold text-slate-100 tracking-tight">{t('hub.title')}</h1>
                 <p className="mt-4 text-lg text-slate-400">{t('hub.subtitle')}</p>
-            </motion.div>
+            </div>
 
-            <motion.div 
-                variants={containerVariants}
+            <div 
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
             >
                 <ExperienceCard 
                     to="/keep-in-touch"
                     title={t('hub.card1.title')}
                     description={t('hub.card1.description')}
+                    delay={0.2}
                 />
                 <ExperienceCard 
                     to="/be-human"
                     title={t('hub.card2.title')}
                     description={t('hub.card2.description')}
+                    delay={0.3}
                 />
-            </motion.div>
-        </motion.div>
+            </div>
+        </div>
     );
 }
 

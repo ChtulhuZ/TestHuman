@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import Window from './Window';
 import KeepInTouch from './KeepInTouch';
 import BeHuman from './BeHuman';
@@ -61,25 +60,20 @@ const DesktopHub: React.FC = () => {
 
 
     const DesktopIcon: React.FC<{onClick: () => void, icon: React.ReactNode, label: string}> = ({ onClick, icon, label }) => (
-        <motion.button 
+        <button 
             onClick={onClick}
-            className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-slate-700/50 transition-colors w-32 text-center"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-slate-700/50 transition-all duration-200 w-32 text-center hover:scale-105 active:scale-95"
         >
             <div className="p-4 bg-slate-800/60 rounded-lg border border-slate-700">
                 {icon}
             </div>
             <span className="text-slate-300 text-sm">{label}</span>
-        </motion.button>
+        </button>
     );
 
     return (
-        <motion.div
-            className="relative w-full h-full p-4 md:p-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
+        <div
+            className="relative w-full h-full p-4 md:p-8 anim-fade-in"
         >
             {/* Desktop Icons */}
             <div className="space-y-4">
@@ -96,47 +90,50 @@ const DesktopHub: React.FC = () => {
             </div>
             
             {/* Windows */}
-            <AnimatePresence>
-                {isSyncOpen && (
-                    <Window 
-                        title="Synchronize Connection" 
-                        onClose={() => setIsSyncOpen(false)}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-auto max-w-[90vw] h-auto max-h-[80vh]"
-                    >
-                        <BeHuman />
-                    </Window>
-                )}
-                {isKitOpen && (
-                    <Window 
-                        title="Keep in Touch" 
-                        onClose={() => setIsKitOpen(false)} 
-                        className="absolute top-8 right-8 w-[400px] h-[640px]"
-                    >
-                        <KeepInTouch />
-                    </Window>
-                )}
-                 {isSurveyWindowOpen && (
-                    <Window
-                        title="HumanMade Research Survey"
-                        onClose={handleCloseSurveyWindow}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px]"
-                    >
-                        <SurveyContent />
-                    </Window>
-                )}
-            </AnimatePresence>
+            
+            {isSyncOpen && (
+                <Window 
+                    title="Synchronize Connection" 
+                    onClose={() => setIsSyncOpen(false)}
+                    initialSize={{ width: 'auto', height: 'auto' }}
+                    isCentered={true}
+                >
+                    <BeHuman />
+                </Window>
+            )}
+            {isKitOpen && (
+                <Window 
+                    title="Keep in Touch" 
+                    onClose={() => setIsKitOpen(false)} 
+                    initialPosition={{ top: 32, right: 32 }}
+                    initialSize={{ width: 400, height: 640 }}
+                >
+                    <KeepInTouch />
+                </Window>
+            )}
+             {isSurveyWindowOpen && (
+                <Window
+                    title="HumanMade Research Survey"
+                    onClose={handleCloseSurveyWindow}
+                    initialSize={{ width: 500, height: 300 }}
+                    isCentered={true}
+                >
+                    <SurveyContent />
+                </Window>
+            )}
+            
 
             {/* Survey UI */}
-            <AnimatePresence>
-                {isSurveyToastVisible && (
-                    <SurveyToast onStart={handleStartSurvey} onDismiss={handleDismissToast} />
-                )}
-                {isSurveyWidgetVisible && (
-                    <SurveyWidget onOpen={handleOpenSurveyFromWidget} onClose={() => setIsSurveyWidgetVisible(false)} />
-                )}
-            </AnimatePresence>
+            
+            {isSurveyToastVisible && (
+                <SurveyToast onStart={handleStartSurvey} onDismiss={handleDismissToast} />
+            )}
+            {isSurveyWidgetVisible && (
+                <SurveyWidget onOpen={handleOpenSurveyFromWidget} onClose={() => setIsSurveyWidgetVisible(false)} />
+            )}
+            
 
-        </motion.div>
+        </div>
     );
 };
 

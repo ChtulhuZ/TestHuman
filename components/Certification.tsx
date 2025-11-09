@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface CertificationProps {
     onCertified: () => void;
@@ -43,12 +42,8 @@ const Certification: React.FC<CertificationProps> = ({ onCertified }) => {
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className="w-full h-full flex flex-col items-center justify-center p-4 md:p-8"
+        <div
+            className="w-full h-full flex flex-col items-center justify-center p-4 md:p-8 anim-fade-in"
         >
             <div className="max-w-4xl w-full h-full flex flex-col">
                 <div 
@@ -85,25 +80,17 @@ const Certification: React.FC<CertificationProps> = ({ onCertified }) => {
                     </div>
                 </div>
                 <div className="flex-shrink-0 mt-6 flex justify-center h-12">
-                    <AnimatePresence>
-                        {canProceed && (
-                            <motion.button 
-                                onClick={onCertified}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                transition={{ duration: 0.3 }}
-                                className="px-8 py-3 bg-cyan-500/80 text-slate-900 font-bold text-lg rounded-lg border border-cyan-400/50 shadow-lg shadow-cyan-500/10 hover:bg-cyan-500"
-                            >
-                                I am human.
-                            </motion.button>
-                        )}
-                    </AnimatePresence>
+                    {canProceed && (
+                        <button 
+                            onClick={onCertified}
+                            className="px-8 py-3 bg-cyan-500/80 text-slate-900 font-bold text-lg rounded-lg border border-cyan-400/50 shadow-lg shadow-cyan-500/10 hover:bg-cyan-500 transition-transform hover:scale-105 active:scale-95 anim-fade-in-up"
+                        >
+                            I am human.
+                        </button>
+                    )}
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 

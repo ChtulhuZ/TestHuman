@@ -1,5 +1,4 @@
 import React, { useState, useEffect, FormEvent, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { SendIcon } from './icons/SendIcon';
 
 const MESSAGE_TIMESTAMP_KEY = 'humanmade_last_message_timestamp';
@@ -151,65 +150,51 @@ const KeepInTouch: React.FC = () => {
     };
     
     return (
-        <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        <div 
             className="flex flex-col w-full h-full bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl"
         >
             <div className="p-4 border-b border-slate-700/50 flex items-center justify-between flex-shrink-0">
                 <h2 className="text-xl font-bold text-slate-100">Keep in Touch</h2>
             </div>
             <div className="flex-1 overflow-y-auto p-6 space-y-2">
-                <AnimatePresence>
-                    {messages.length === 0 && !isSentOrOnCooldown && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-center text-slate-400 pt-10"
-                        >
-                            <p className="italic text-slate-300 mb-6 text-base/loose">The purpose of this space is to re-establish slow, human connection.</p>
-                            <p>You can send one message every 24 hours.</p>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                <AnimatePresence initial={false}>
-                    {messages.map((msg) => (
-                        <motion.div 
-                            key={msg.id}
-                            layout
-                            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            className="space-y-4"
-                        >
-                            <div className="flex items-start gap-3 justify-end">
-                                <div className="max-w-xs rounded-xl px-4 py-3 bg-cyan-500/80 text-slate-900">
-                                    <p className="whitespace-pre-wrap">{msg.text}</p>
-                                    <p className="text-xs text-slate-800/70 text-right mt-1">{new Date(msg.sentAt).toLocaleString()}</p>
+                
+                {messages.length === 0 && !isSentOrOnCooldown && (
+                    <div
+                        className="text-center text-slate-400 pt-10 anim-fade-in-up"
+                    >
+                        <p className="italic text-slate-300 mb-6 text-base/loose">The purpose of this space is to re-establish slow, human connection.</p>
+                        <p>You can send one message every 24 hours.</p>
+                    </div>
+                )}
+               
+                {messages.map((msg) => (
+                    <div 
+                        key={msg.id}
+                        className="space-y-4 anim-slide-in-message"
+                    >
+                        <div className="flex items-start gap-3 justify-end">
+                            <div className="max-w-xs rounded-xl px-4 py-3 bg-cyan-500/80 text-slate-900">
+                                <p className="whitespace-pre-wrap">{msg.text}</p>
+                                <p className="text-xs text-slate-800/70 text-right mt-1">{new Date(msg.sentAt).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        {msg.reply && (
+                            <div
+                                style={{animationDelay: '0.3s'}}
+                                className="flex items-start gap-3 justify-start anim-slide-in-message"
+                            >
+                                 <div className="w-8 h-8 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-cyan-300 text-sm">
+                                    HM
+                                </div>
+                                <div className="max-w-xs rounded-xl px-4 py-3 bg-slate-700 text-slate-200">
+                                   <p className="whitespace-pre-wrap">{msg.reply.text}</p>
+                                   <p className="text-xs text-slate-400/70 text-right mt-1">{new Date(msg.reply.receivedAt).toLocaleString()}</p>
                                 </div>
                             </div>
-                            {msg.reply && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.3, duration: 0.4, ease: "easeOut" }}
-                                    className="flex items-start gap-3 justify-start"
-                                >
-                                     <div className="w-8 h-8 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-cyan-300 text-sm">
-                                        HM
-                                    </div>
-                                    <div className="max-w-xs rounded-xl px-4 py-3 bg-slate-700 text-slate-200">
-                                       <p className="whitespace-pre-wrap">{msg.reply.text}</p>
-                                       <p className="text-xs text-slate-400/70 text-right mt-1">{new Date(msg.reply.receivedAt).toLocaleString()}</p>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
+                        )}
+                    </div>
+                ))}
+                
                 <div ref={messagesEndRef} />
             </div>
             <div className="p-4 border-t border-slate-700/50 flex-shrink-0">
@@ -232,7 +217,7 @@ const KeepInTouch: React.FC = () => {
                         </button>
                     </form>
                 ) : (
-                    <div className="text-center">
+                    <div className="text-center anim-fade-in">
                         <h3 className="font-semibold text-cyan-300 mb-2">Thank you for your message!</h3>
                         <p className="text-slate-400 text-sm mb-4">I'll reply soon. Enable notifications to stay in touch.</p>
                         <div className="bg-slate-900/50 border border-slate-700 rounded-lg px-6 py-2 inline-block" aria-live="polite">
@@ -242,7 +227,7 @@ const KeepInTouch: React.FC = () => {
                     </div>
                 )}
             </div>
-        </motion.div>
+        </div>
     );
 };
 

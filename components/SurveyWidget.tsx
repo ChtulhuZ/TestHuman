@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { CloseIcon } from './icons/CloseIcon';
 import { ClipboardIcon } from './icons/ClipboardIcon';
 
@@ -8,22 +7,18 @@ interface SurveyWidgetProps {
     onClose: () => void;
 }
 
-const widgetVariants = {
-    hidden: { opacity: 0, x: -30, scale: 0.95 },
-    visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
-    exit: { opacity: 0, x: -20, scale: 0.95, transition: { duration: 0.3, ease: 'easeIn' as const } },
-};
-
 const SurveyWidget: React.FC<SurveyWidgetProps> = ({ onOpen, onClose }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const [isExiting, setIsExiting] = useState(false);
+
+    const handleClose = () => {
+        setIsExiting(true);
+        setTimeout(onClose, 300); // match animation duration
+    }
 
     return (
-        <motion.div
-            variants={widgetVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="fixed bottom-6 left-6 w-80 z-40"
+        <div
+            className={`fixed bottom-6 left-6 w-80 z-40 transition-all duration-300 ${isExiting ? 'opacity-0 -translate-x-5' : 'opacity-100 translate-x-0'}`}
         >
             <div 
                 className="bg-slate-800/60 backdrop-blur-md border border-slate-700 rounded-lg shadow-2xl overflow-hidden"
@@ -36,7 +31,7 @@ const SurveyWidget: React.FC<SurveyWidgetProps> = ({ onOpen, onClose }) => {
                         <span className="font-bold text-slate-200 text-sm">Active Surveys</span>
                     </div>
                      <button 
-                        onClick={onClose} 
+                        onClick={handleClose} 
                         className="p-1 rounded-full text-slate-400 hover:bg-slate-700/50 hover:text-slate-100 transition-colors"
                         aria-label="Close survey widget"
                     >
@@ -52,18 +47,13 @@ const SurveyWidget: React.FC<SurveyWidgetProps> = ({ onOpen, onClose }) => {
                         <span>loading survey...</span>
                     </div>
                 </div>
-                 <AnimatePresence>
-                {isHovered && (
-                    <motion.div 
-                        initial={{ height: 0 }}
-                        animate={{ height: '2px' }}
-                        exit={{ height: 0 }}
-                        className="bg-cyan-400"
-                    />
-                )}
-                </AnimatePresence>
+                
+                <div 
+                    className="bg-cyan-400 transition-all duration-300"
+                    style={{ height: isHovered ? '2px' : '0px' }}
+                />
             </div>
-        </motion.div>
+        </div>
     );
 };
 

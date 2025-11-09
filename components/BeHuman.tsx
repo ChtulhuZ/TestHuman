@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { SyncIcon } from './icons/SyncIcon';
 import { useTranslation } from '../hooks/useTranslation';
 import { solvePuzzle } from '../services/geminiService';
@@ -53,7 +52,7 @@ const BeHuman: React.FC = () => {
     const [grid, setGrid] = useState<boolean[][] | null>(null);
     const [solved, setSolved] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [simulatedClick, setSimulatedClick] = useState<{ r: number, c: number, id: number } | null>(null);
+    const [simulatedClick, setSimulatedClick] = useState<{ r: number, c: number } | null>(null);
     const [startTime, setStartTime] = useState<number | null>(null);
     const [elapsedTime, setElapsedTime] = useState(0);
     const [interactionCount, setInteractionCount] = useState(0);
@@ -157,8 +156,8 @@ const BeHuman: React.FC = () => {
                 if (!prevGrid) return prevGrid;
                 const r = Math.floor(Math.random() * GRID_SIZE);
                 const c = Math.floor(Math.random() * GRID_SIZE);
-                setSimulatedClick({ r, c, id: Date.now() });
-                setTimeout(() => setSimulatedClick(null), 400);
+                setSimulatedClick({ r, c });
+                setTimeout(() => setSimulatedClick(null), 1500); // Duration of pulse animation
                 return toggleConnections(prevGrid, r, c);
             });
         };
@@ -214,12 +213,7 @@ const BeHuman: React.FC = () => {
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-        >
+        <div className="anim-fade-in-up">
             <div className="p-4 md:p-8">
                 <div className="flex justify-between items-start mb-6">
                     <div>
@@ -234,28 +228,16 @@ const BeHuman: React.FC = () => {
                             {grid?.map((rowArr, r) =>
                                 rowArr.map((cell, c) => (
                                     <div key={`${r}-${c}`} className="relative">
-                                         <motion.button
+                                         <button
                                             onClick={() => handleCellClick(r, c)}
-                                            className={`w-12 h-12 md:w-16 md:h-16 rounded-md transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 focus-visible:ring-cyan-400 relative z-10`}
+                                            className={`w-12 h-12 md:w-16 md:h-16 rounded-md transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 focus-visible:ring-cyan-400 relative z-10 active:scale-90 ${simulatedClick?.r === r && simulatedClick?.c === c ? 'anim-pulse-border' : ''}`}
                                             style={{
                                                 backgroundColor: cell ? '#22d3ee' : '#1e293b',
                                                 boxShadow: cell ? '0 0 15px #22d3ee, inset 0 0 5px rgba(255, 255, 255, 0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.5)',
                                             }}
-                                            whileTap={{ scale: solved || isLoading ? 1 : 0.9 }}
                                             disabled={solved || isLoading || !!cooldownTimestamp}
                                             aria-label={`Grid cell row ${r+1}, column ${c+1}. State: ${cell ? 'On' : 'Off'}`}
                                         />
-                                        <AnimatePresence>
-                                        {simulatedClick?.r === r && simulatedClick?.c === c && (
-                                            <motion.div
-                                                key={simulatedClick.id}
-                                                className="absolute inset-0 rounded-md border-2 border-yellow-300 pointer-events-none"
-                                                initial={{ opacity: 1, scale: 0.8 }}
-                                                animate={{ opacity: 0, scale: 1.2 }}
-                                                transition={{ duration: 0.4, ease: "easeOut" }}
-                                            />
-                                        )}
-                                        </AnimatePresence>
                                     </div>
                                 ))
                             )}
@@ -263,13 +245,11 @@ const BeHuman: React.FC = () => {
                     </div>
 
                     <div className="w-full md:w-72 text-center flex flex-col items-center justify-center gap-6">
-                       <AnimatePresence mode="wait">
+                       
                        {cooldownTimestamp ? (
-                           <motion.div
+                           <div
                                 key="cooldown"
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
+                                className="anim-fade-in"
                            >
                                 <h3 className="font-semibold text-2xl text-cyan-300 mb-2">{t('beHuman.solved.title')}</h3>
                                 <p className="text-slate-300 mb-4">{t('beHuman.solved.description')}</p>
@@ -289,14 +269,11 @@ const BeHuman: React.FC = () => {
                                     <p className="text-slate-400 text-xs mb-1">{t('beHuman.cooldown.nextSync')}</p>
                                     <p className="text-2xl font-mono font-bold text-slate-100 tracking-wider">{timeLeft || t('beHuman.cooldown.loading')}</p>
                                 </div>
-                           </motion.div>
+                           </div>
                        ) : (
-                           <motion.div
+                           <div
                                 key="playing"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="w-full"
+                                className="w-full anim-fade-in"
                            >
                                <div className="mb-6">
                                     <p className="text-sm text-slate-400 uppercase tracking-widest">{t('beHuman.timerLabel')}</p>
@@ -309,39 +286,29 @@ const BeHuman: React.FC = () => {
                                    disabled={isLoading}
                                    className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                                 >
-                                   <div className="relative w-5 h-5">
-                                       <AnimatePresence>
+                                   <div className="relative w-5 h-5 flex items-center justify-center">
                                        {isLoading ? (
-                                           <motion.div
+                                           <div
                                                 key="loader"
                                                 className="absolute inset-0 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"
-                                                initial={{ opacity: 0, scale: 0.5 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.5 }}
-                                           ></motion.div>
+                                           ></div>
                                        ) : (
-                                           <motion.div 
-                                                key="icon"
-                                                initial={{ opacity: 0, scale: 0.5 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.5 }}
-                                           >
+                                           <div key="icon">
                                                 <SyncIcon className="w-5 h-5 transform transition-transform group-hover:rotate-90" />
-                                           </motion.div>
+                                           </div>
                                        )}
-                                       </AnimatePresence>
                                    </div>
                                    <span>
                                        {isLoading ? t('beHuman.forceSyncLoading') : t('beHuman.forceSync')}
                                    </span>
                                </button>
-                           </motion.div>
+                           </div>
                        )}
-                       </AnimatePresence>
+                       
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 
