@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HumanMade</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b50;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.3.11",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.5"
+  }
+}
+</script>
+<!-- Add Babel Standalone for in-browser JSX/TSX transpilation -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-900 text-slate-200">
+    <div id="root"></div>
+    <!-- All application code is now embedded here and transpiled by Babel -->
+    <script type="text/babel" data-type="module">
+//================================================================
+// IMPORTS FROM CDN (via importmap)
+//================================================================
+import React, { useState, useEffect, useRef, createContext, useContext, useMemo, useCallback } from 'react';
+import ReactDOM from 'react-dom/client';
+import { AnimatePresence, motion } from 'framer-motion';
+import { GoogleGenAI, Type } from "@google/genai";
+
+//================================================================
+// TRANSLATIONS & INTERNATIONALIZATION
+//================================================================
+const translations = {
+    it: {
+        header: {
+            experiences: "Esperienze",
+            projects: "Progetti",
+            keepInTouch: "Resta in Contatto",
+            synchronizeConnection: "Sincronizza Connessione",
+            hmCertification: "Certificazione HM",
+        },
+        hub: {
+            title: "Esperienze Digitali, Tocco Umano.",
+            subtitle: "Esplora spazi interattivi progettati per riconnettersi con l'elemento umano in un mondo digitale.",
+            card: {
+                enterExperience: "Entra nell'Esperienza",
+            },
+            card1: {
+                title: "Resta in Contatto",
+                description: "Uno spazio per una comunicazione lenta e deliberata. Invia un messaggio ogni 24 ore e attendi una risposta ponderata.",
+            },
+            card2: {
+                title: "Sincronizza Connessione",
+                description: "Un puzzle logico collaborativo. Ogni interazione influenza la griglia. Lavora con gli altri per raggiungere la piena sincronizzazione.",
+            }
+        },
+        keepInTouch: {
+            title: "Resta in Contatto",
+            hub: "Hub",
+            intro: {
+                line1: "Lo scopo di questo spazio è ristabilire una connessione lenta e umana. Si tratta di abbracciare la curiosità per ciò che viene \"dopo\", senza il bisogno di \"tutto in una volta\".",
+                line2: "Puoi inviare un messaggio ogni 24 ore. Non vedo l'ora di sentirti.",
+            },
+            placeholder: "Scrivi qui il tuo messaggio...",
+            cooldown: {
+                thankYou: "Grazie per il tuo messaggio!",
+                replySoon: "Risponderò presto. Abilita le notifiche per rimanere in contatto.",
+                nextMessage: "Prossimo messaggio disponibile tra:",
+                loading: "Caricamento...",
+            }
+        },
+        beHuman: {
+            title: "Sincronizza Connessione",
+            subtitle: "La griglia è uno spazio condiviso. Altre connessioni vengono stabilite. Lavorate insieme per raggiungere la sincronizzazione.",
+            timerLabel: "Tempo Trascorso",
+            forceSync: "Forza Sincronizzazione",
+            forceSyncLoading: "Sincronizzazione...",
+            solved: {
+                title: "Sincronizzazione Raggiunta",
+                description: "Tutte le connessioni sono ora attive.",
+                completionTime: "Tempo di completamento: {time}",
+                participants: "{count} interazioni hanno contribuito.",
+            },
+            cooldown: {
+                nextSync: "Prossima sincronizzazione disponibile tra:",
+                loading: "Caricamento...",
+            },
+            backToHub: "Torna all'Hub",
+        },
+        certification: {
+            hub: "Hub",
+            title: "Certificazione Human Made",
+            subtitle: "Il Prodotto Organico della Tecnologia.",
+            p1: "In un'era dominata dall'intelligenza artificiale, il sigillo <bold>Human Made</bold> significa un impegno per la creatività umana pura e non assistita. Questa certificazione viene assegnata a prodotti, opere d'arte e servizi creati senza l'uso di IA generativa nel loro processo creativo principale.",
+            p2: "Rappresenta il valore del tocco umano, dell'intenzione e dell'abilità. Dal codice scritto a mano alla musica composta originalemente, la certificazione Human Made sostiene l'output unico, imperfetto e profondamente personale che solo una mente umana può concepire.",
+            p3: "Crediamo che, sebbene l'IA sia uno strumento potente, esista una qualità insostituibile nelle creazioni nate dall'esperienza, dalla lotta e dall'ispirazione umana. Questo progetto mira a preservare ed evidenziare tale qualità, offrendo una chiara distinzione per i consumatori che cercano autenticità in un mondo digitalmente saturo.",
+            principles: {
+                title: "Principi Fondamentali:",
+                authenticity: "<bold>Autenticità:</bold> Verificare che il lavoro concettuale ed esecutivo sia guidato da autori umani.",
+                transparency: "<bold>Trasparenza:</bold> Dichiarazione chiara degli strumenti utilizzati, garantendo che nessuna IA generativa abbia fatto parte dell'ideazione o della produzione creativa.",
+                craftsmanship: "<bold>Artigianalità:</bold> Celebrare l'abilità, il tempo e la dedizione inerenti alle opere realizzate dall'uomo.",
+            }
+        }
+    },
+    en: {
+        header: {
+            experiences: "Experiences",
+            projects: "Projects",
+            keepInTouch: "Keep in Touch",
+            synchronizeConnection: "Synchronize Connection",
+            hmCertification: "HM Certification",
+        },
+        hub: {
+            title: "Digital Experiences, Human Touch.",
+            subtitle: "Explore interactive spaces designed to reconnect with the human element in a digital world.",
+            card: {
+                enterExperience: "Enter Experience",
+            },
+            card1: {
+                title: "Keep in Touch",
+                description: "A space for slow, deliberate communication. Send one message every 24 hours and await a thoughtful reply.",
+            },
+            card2: {
+                title: "Synchronize Connection",
+                description: "A collaborative resonance puzzle. Every presence influences the grid. Work in unison to achieve full synchronization.",
+            }
+        },
+        keepInTouch: {
+            title: "Keep in Touch",
+            hub: "Hub",
+            intro: {
+                line1: "The purpose of this space is to re-establish slow, human connection. It's about embracing curiosity for what comes \"after,\" without the need for \"all at once.\"",
+                line2: "You can send one message every 24 hours. I look forward to hearing from you.",
+            },
+            placeholder: "Write your message here...",
+            cooldown: {
+                thankYou: "Thank you for your message!",
+                replySoon: "I'll reply soon. Enable notifications to stay in touch.",
+                nextMessage: "Next message available in:",
+                loading: "Loading...",
+            }
+        },
+        beHuman: {
+            title: "Synchronize Connection",
+            subtitle: "The grid is a shared consciousness. Other presences are felt. Work in unison to achieve resonance.",
+            timerLabel: "Time Elapsed",
+            forceSync: "Force Synchronization",
+            forceSyncLoading: "Synchronizing...",
+            solved: {
+                title: "Resonance Achieved",
+                description: "All connections are now harmonized.",
+                completionTime: "Synchronized in: {time}",
+                participants: "{count} presences contributed to the whole.",
+            },
+            cooldown: {
+                nextSync: "Next convergence possible in:",
+                loading: "Loading...",
+            },
+            backToHub: "Return to Hub",
+        },
+        certification: {
+            hub: "Hub",
+            title: "Human Made Certification",
+            subtitle: "The Organic Product of Technology.",
+            p1: "In an era dominated by artificial intelligence, the <bold>Human Made</bold> seal signifies a commitment to pure, unassisted human creativity. This certification is awarded to products, artworks, and services created without the use of generative AI in their core creative process.",
+            p2: "It represents the value of human touch, intention, and skill. From handcrafted code to originally composed music, the Human Made certification champions the unique, imperfect, and deeply personal output that only a human mind can conceive.",
+            p3: "We believe that while AI is a powerful tool, there is an irreplaceable quality to creations born from human experience, struggle, and inspiration. This project aims to preserve and highlight that quality, offering a clear distinction for consumers who seek authenticity in a digitally saturated world.",
+            principles: {
+                title: "Core Principles:",
+                authenticity: "<bold>Authenticity:</bold> Verifying that the conceptual and executional work is driven by human authors.",
+                transparency: "<bold>Transparency:</bold> Clear declaration of tools used, ensuring no generative AI was part of the creative ideation or production.",
+                craftsmanship: "<bold>Craftsmanship:</bold> Celebrating the skill, time, and dedication inherent in human-made works.",
+            }
+        }
+    },
+    de: {
+        header: {
+            experiences: "Erlebnisse",
+            projects: "Projekte",
+            keepInTouch: "In Kontakt bleiben",
+            synchronizeConnection: "Verbindung synchronisieren",
+            hmCertification: "HM-Zertifizierung",
+        },
+        hub: {
+            title: "Digitale Erlebnisse, menschliche Note.",
+            subtitle: "Entdecken Sie interaktive Räume, die darauf ausgelegt sind, das menschliche Element in einer digitalen Welt wiederzuentdecken.",
+            card: {
+                enterExperience: "Erlebnis betreten",
+            },
+            card1: {
+                title: "In Kontakt bleiben",
+                description: "Ein Raum für langsame, bewusste Kommunikation. Senden Sie alle 24 Stunden eine Nachricht und erwarten Sie eine durchdachte Antwort.",
+            },
+            card2: {
+                title: "Verbindung synchronisieren",
+                description: "Ein kollaboratives Logikrätsel. Jede Interaktion beeinflusst das Gitter. Arbeiten Sie mit anderen zusammen, um eine vollständige Synchronisierung zu erreichen.",
+            }
+        },
+        keepInTouch: {
+            title: "In Kontakt bleiben",
+            hub: "Hub",
+            intro: {
+                line1: "Der Zweck dieses Raumes ist es, eine langsame, menschliche Verbindung wiederherzustellen. Es geht darum, die Neugier auf das, was „danach“ kommt, anzunehmen, ohne das Bedürfnis nach „alles auf einmal“.",
+                line2: "Sie können alle 24 Stunden eine Nachricht senden. Ich freue mich darauf, von Ihnen zu hören.",
+            },
+            placeholder: "Schreiben Sie hier Ihre Nachricht...",
+            cooldown: {
+                thankYou: "Vielen Dank für Ihre Nachricht!",
+                replySoon: "Ich werde bald antworten. Aktivieren Sie Benachrichtigungen, um in Kontakt zu bleiben.",
+                nextMessage: "Nächste Nachricht verfügbar in:",
+                loading: "Wird geladen...",
+            }
+        },
+        beHuman: {
+            title: "Verbindung synchronisieren",
+            subtitle: "Das Gitter ist ein gemeinsamer Raum. Andere Verbindungen werden hergestellt. Arbeiten Sie zusammen, um die Synchronisierung zu erreichen.",
+            timerLabel: "Verstrichene Zeit",
+            forceSync: "Synchronisierung erzwingen",
+            forceSyncLoading: "Synchronisiere...",
+            solved: {
+                title: "Synchronisierung erreicht",
+                description: "Alle Verbindungen sind jetzt aktiv.",
+                completionTime: "Abschlusszeit: {time}",
+                participants: "{count} Interaktionen haben beigetragen.",
+            },
+            cooldown: {
+                nextSync: "Nächste Synchronisierung verfügbar in:",
+                loading: "Wird geladen...",
+            },
+            backToHub: "Zurück zum Hub",
+        },
+        certification: {
+            hub: "Hub",
+            title: "Human Made Zertifizierung",
+            subtitle: "Das organische Produkt der Technologie.",
+            p1: "In einer von künstlicher Intelligenz dominierten Ära bedeutet das <bold>Human Made</bold>-Siegel ein Bekenntnis zu reiner, unassistierter menschlicher Kreativität. Diese Zertifizierung wird an Produkte, Kunstwerke und Dienstleistungen vergeben, die ohne den Einsatz von generativer KI in ihrem kreativen Kernprozess erstellt wurden.",
+            p2: "Es repräsentiert den Wert von menschlicher Note, Absicht und Fähigkeit. Von handgeschriebenem Code bis hin zu original komponierter Musik, die Human Made-Zertifizierung setzt sich für das einzigartige, unvollkommene und zutiefst persönliche Ergebnis ein, das nur ein menschlicher Geist konzipieren kann.",
+            p3: "Wir glauben, dass KI zwar ein mächtiges Werkzeug ist, aber eine unersetzliche Qualität in Schöpfungen steckt, die aus menschlicher Erfahrung, Kampf und Inspiration geboren werden. Dieses Projekt zielt darauf ab, diese Qualität zu bewahren und hervorzuheben und bietet eine klare Unterscheidung für Verbraucher, die in einer digital gesättigten Welt Authentizität suchen.",
+            principles: {
+                title: "Grundprinzipien:",
+                authenticity: "<bold>Authentizität:</bold> Überprüfung, dass die konzeptionelle und ausführende Arbeit von menschlichen Autoren geleistet wird.",
+                transparency: "<bold>Transparenz:</bold> Klare Deklaration der verwendeten Werkzeuge, um sicherzustellen, dass keine generative KI Teil der kreativen Ideenfindung oder Produktion war.",
+                craftsmanship: "<bold>Handwerkskunst:</bold> Feier der Fähigkeit, Zeit und Hingabe, die in von Menschen geschaffenen Werken steckt.",
+            }
+        }
+    },
+    fr: {
+        header: {
+            experiences: "Expériences",
+            projects: "Projets",
+            keepInTouch: "Garder le contact",
+            synchronizeConnection: "Synchroniser la Connexion",
+            hmCertification: "Certification HM",
+        },
+        hub: {
+            title: "Expériences Numériques, Touche Humaine.",
+            subtitle: "Explorez des espaces interactifs conçus pour renouer avec l'élément humain dans un monde numérique.",
+            card: {
+                enterExperience: "Entrer dans l'Expérience",
+            },
+            card1: {
+                title: "Garder le contact",
+                description: "Un espace pour une communication lente et réfléchie. Envoyez un message toutes les 24 heures et attendez une réponse mûrement réfléchie.",
+            },
+            card2: {
+                title: "Synchroniser la Connexion",
+                description: "Un puzzle logique collaboratif. Chaque interaction influence la grille. Collaborez avec d'autres pour atteindre une synchronisation complète.",
+            }
+        },
+        keepInTouch: {
+            title: "Garder le contact",
+            hub: "Hub",
+            intro: {
+                line1: "Le but de cet espace est de rétablir une connexion humaine lente. Il s'agit d'embrasser la curiosité pour ce qui vient « après », sans avoir besoin de « tout à la fois ».",
+                line2: "Vous pouvez envoyer un message toutes les 24 heures. J'ai hâte d'avoir de vos nouvelles.",
+            },
+            placeholder: "Écrivez votre message ici...",
+            cooldown: {
+                thankYou: "Merci pour votre message !",
+                replySoon: "Je répondrai bientôt. Activez les notifications pour rester en contact.",
+                nextMessage: "Prochain message disponible dans :",
+                loading: "Chargement...",
+            }
+        },
+        beHuman: {
+            title: "Synchroniser la Connexion",
+            subtitle: "La grille est un espace partagé. D'autres connexions sont en cours. Collaborez pour atteindre la synchronisation.",
+            timerLabel: "Temps écoulé",
+            forceSync: "Forcer la synchronisation",
+            forceSyncLoading: "Synchronisation...",
+            solved: {
+                title: "Synchronisation Réussie",
+                description: "Toutes les connexions sont maintenant actives.",
+                completionTime: "Temps de complétion : {time}",
+                participants: "{count} interactions ont contribué.",
+            },
+            cooldown: {
+                nextSync: "Prochaine synchronisation disponible dans :",
+                loading: "Chargement...",
+            },
+            backToHub: "Retour au Hub",
+        },
+        certification: {
+            hub: "Hub",
+            title: "Certification Human Made",
+            subtitle: "Le Produit Organique de la Technologie.",
+            p1: "À une époque dominée par l'intelligence artificielle, le sceau <bold>Human Made</bold> témoigne d'un engagement en faveur d'une créativité humaine pure et non assistée. Cette certification est décernée aux produits, œuvres d'art et services créés sans l'utilisation d'IA générative dans leur processus créatif principal.",
+            p2: "Elle représente la valeur de la touche humaine, de l'intention et de la compétence. Du code artisanal à la musique originale, la certification Human Made défend le produit unique, imparfait et profondément personnel que seul un esprit humain peut concevoir.",
+            p3: "Nous croyons que si l'IA est un outil puissant, il existe une qualité irremplaçable dans les créations nées de l'expérience, de la lutte et de l'inspiration humaines. Ce projet vise à préserver et à mettre en évidence cette qualité, offrant une distinction claire aux consommateurs qui recherchent l'authenticité dans un monde numériquement saturé.",
+            principles: {
+                title: "Principes Fondamentaux :",
+                authenticity: "<bold>Authenticité :</bold> Vérifier que le travail conceptuel et exécutif est dirigé par des auteurs humains.",
+                transparency: "<bold>Transparence :</bold> Déclaration claire des outils utilisés, garantissant qu'aucune IA générative n'a participé à l'idéation ou à la production créative.",
+                craftsmanship: "<bold>Artisanat :</bold> Célébrer la compétence, le temps et le dévouement inhérents aux œuvres créées par l'homme.",
+            }
+        }
+    },
+    ru: {
+        header: {
+            experiences: "Впечатления",
+            projects: "Проекты",
+            keepInTouch: "Оставаться на связи",
+            synchronizeConnection: "Синхронизировать соединение",
+            hmCertification: "Сертификация HM",
+        },
+        hub: {
+            title: "Цифровые впечатления, человеческое прикосновение.",
+            subtitle: "Исследуйте интерактивные пространства, созданные для воссоединения с человеческим элементом в цифровом мире.",
+            card: {
+                enterExperience: "Войти во впечатление",
+            },
+            card1: {
+                title: "Оставаться на связи",
+                description: "Пространство для медленного, осмысленного общения. Отправляйте одно сообщение каждые 24 часа и ожидайте вдумчивого ответа.",
+            },
+            card2: {
+                title: "Синхронизировать соединение",
+                description: "Совместная логическая головоломка. Каждое взаимодействие влияет на сетку. Работайте вместе с другими, чтобы достичь полной синхронизации.",
+            }
+        },
+        keepInTouch: {
+            title: "Оставаться на связи",
+            hub: "Хаб",
+            intro: {
+                line1: "Цель этого пространства — восстановить медленную, человеческую связь. Речь идет о том, чтобы принять любопытство к тому, что будет «после», без необходимости «все сразу».",
+                line2: "Вы можете отправлять одно сообщение каждые 24 часа. С нетерпением жду вашего ответа.",
+            },
+            placeholder: "Напишите ваше сообщение здесь...",
+            cooldown: {
+                thankYou: "Спасибо за ваше сообщение!",
+                replySoon: "Я скоро отвечу. Включите уведомления, чтобы оставаться на связи.",
+                nextMessage: "Следующее сообщение будет доступно через:",
+                loading: "Загрузка...",
+            }
+        },
+        beHuman: {
+            title: "Синхронизировать соединение",
+            subtitle: "Сетка — это общее пространство. Устанавливаются другие соединения. Работайте вместе, чтобы достичь синхронизации.",
+            timerLabel: "Прошедшее время",
+            forceSync: "Принудительная синхронизация",
+            forceSyncLoading: "Синхронизация...",
+            solved: {
+                title: "Синхронизация достигнута",
+                description: "Все соединения теперь активны.",
+                completionTime: "Время завершения: {time}",
+                participants: "Внесли вклад {count} взаимодействий.",
+            },
+            cooldown: {
+                nextSync: "Следующая синхронизация доступна через:",
+                loading: "Загрузка...",
+            },
+            backToHub: "Вернуться в Хаб",
+        },
+        certification: {
+            hub: "Хаб",
+            title: "Сертификация Human Made",
+            subtitle: "Органический продукт технологии.",
+            p1: "В эпоху, где доминирует искусственный интеллект, печать <bold>Human Made</bold> означает приверженность чистой, человеческой креативности без помощи ИИ. Эта сертификация присуждается продуктам, произведениям искусства и услугам, созданным без использования генеративного ИИ в их основном творческом процессе.",
+            p2: "Она представляет ценность человеческого прикосновения, намерения и мастерства. От написанного вручную кода до оригинально сочиненной музыки, сертификация Human Made отстаивает уникальный, несовершенный и глубоко личный результат, который может создать только человеческий разум.",
+            p3: "Мы верим, что, хотя ИИ является мощным инструментом, существует незаменимое качество в творениях, рожденных из человеческого опыта, борьбы и вдохновения. Этот проект направлен на сохранение и подчеркивание этого качества, предлагая четкое различие для потребителей, которые ищут подлинность в цифровом насыщенном мире.",
+            principles: {
+                title: "Основные принципы:",
+                authenticity: "<bold>Подлинность:</bold> Проверка того, что концептуальная и исполнительная работа ведется людьми-авторами.",
+                transparency: "<bold>Прозрачность:</bold> Четкое указание используемых инструментов, гарантирующее, что генеративный ИИ не был частью творческого процесса или производства.",
+                craftsmanship: "<bold>Мастерство:</bold> Восхваление мастерства, времени и преданности, присущих работам, созданным человеком.",
+            }
+        }
+    },
+};
+
+const LanguageContext = createContext(undefined);
+
+const LanguageProvider = ({ children }) => {
+    const [locale, setLocale] = useState('en'); 
+    
+    const value = useMemo(() => ({
+        locale,
+        translations: translations[locale],
+        setLocale
+    }), [locale]);
+
+    return (
+        <LanguageContext.Provider value={value}>
+            {children}
+        </LanguageContext.Provider>
+    );
+};
+
+const useLanguage = () => {
+    const context = useContext(LanguageContext);
+    if (context === undefined) {
+        throw new Error('useLanguage must be used within a LanguageProvider');
+    }
+    return context;
+};
+
+const useTranslation = () => {
+    const { translations } = useLanguage();
+
+    const t = (key) => {
+        const keys = key.split('.');
+        let result = translations;
+        for (const k of keys) {
+            result = result[k];
+            if (result === undefined) {
+                console.warn(`Translation key not found: ${key}`);
+                return key;
+            }
+        }
+        return result;
+    };
+
+    return { t };
+};
+
+
+//================================================================
+// GEMINI API SERVICE
+//================================================================
+const API_KEY = process.env.API_KEY;
+
+if (!API_KEY) {
+    console.warn("API_KEY environment variable not set. Gemini API calls will fail. This is expected if you are running this file directly in a browser without a pre-configured environment.");
+}
+
+const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+let chat = null;
+
+const initializeChat = (history) => {
+    const contents = history.map(msg => ({
+        role: msg.role,
+        parts: [{ text: msg.text }]
+    }));
+
+    return ai.chats.create({
+        model: 'gemini-2.5-flash',
+        history: contents,
+        config: {
+            systemInstruction: 'You are a philosophical AI. A user wants to discuss what it means to be human. Start a concise, engaging conversation with them with a thought-provoking question about humanity.',
+        },
+    });
+};
+
+const getChatResponse = async (history, newMessage) => {
+    try {
+        chat = initializeChat(history);
+        const result = await chat.sendMessage({ message: newMessage });
+        return result.text;
+    } catch (error) {
+        console.error("Error getting chat response from Gemini:", error);
+        return "An error occurred while connecting to the AI. Please try again.";
+    }
+};
+
+const gridToString = (grid) => {
+    return grid.map(row => row.map(cell => (cell ? 'X' : 'O')).join(' ')).join('\\n');
+};
+
+const solvePuzzle = async (grid) => {
+    try {
+        const prompt = `
+You are a logic puzzle expert. The puzzle is a ${grid.length}x${grid[0].length} grid of lights.
+The goal is to turn all lights ON ('X').
+When you press a light, that light and its direct neighbors (up, down, left, right) flip their state (ON to OFF, OFF to ON).
+This is the current state of the grid ('X' means ON, 'O' means OFF):
+---
+${gridToString(grid)}
+---
+Provide the sequence of clicks (row, column) required to solve the puzzle.
+Return your answer ONLY as a JSON array of coordinate objects, like [{"row": r1, "col": c1}, {"row": r2, "col": c2}].
+The coordinates are 0-indexed. If the puzzle is already solved, return an empty array.
+`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-pro',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.ARRAY,
+                    items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            row: { type: Type.INTEGER },
+                            col: { type: Type.INTEGER },
+                        },
+                        required: ['row', 'col'],
+                    },
+                },
+            },
+        });
+
+        let jsonStr = response.text.trim();
+        if (jsonStr.startsWith("```json")) {
+            jsonStr = jsonStr.substring(7, jsonStr.length - 3).trim();
+        } else if (jsonStr.startsWith("```")) {
+            jsonStr = jsonStr.substring(3, jsonStr.length - 3).trim();
+        }
+        
+        const solution = JSON.parse(jsonStr);
+        return solution;
+
+    } catch (error) {
+        console.error("Error solving puzzle with Gemini:", error);
+        return [];
+    }
+};
+
+
+//================================================================
+// SVG ICONS
+//================================================================
+const SendIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+    </svg>
+);
+const SyncIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+    </svg>
+);
+const CloseIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+    </svg>
+);
+const LetterIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+    </svg>
+);
+const ClipboardIcon = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125T8.25 4.5h7.5a1.125 1.125 0 0 1 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125h-7.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A1.125 1.125 0 0 1 8.25 4.5h1.125a9.06 9.06 0 0 1 1.5.124M10.5 10.5h3.375c.621 0 1.125.504 1.125 1.125v3.375c0 .621-.504 1.125-1.125 1.125h-3.375a1.125 1.125 0 0 1-1.125-1.125v-3.375c0-.621.504-1.125 1.125-1.125Z" />
+    </svg>
+);
+
+
+//================================================================
+// REACT COMPONENTS
+//================================================================
+
+const Certification = ({ onCertified }) => {
+    const [canProceed, setCanProceed] = useState(false);
+    const scrollContainerRef = useRef(null);
+
+    useEffect(() => {
+        const checkForScroll = () => {
+            const container = scrollContainerRef.current;
+            if (container && container.scrollHeight <= container.clientHeight) {
+                setCanProceed(true);
+            }
+        };
+        const timer = setTimeout(checkForScroll, 100);
+        window.addEventListener('resize', checkForScroll);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', checkForScroll);
+        };
+    }, []);
+
+    const handleScroll = () => {
+        if (canProceed) return;
+        const container = scrollContainerRef.current;
+        if (container) {
+            const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 5;
+            if (isAtBottom) {
+                setCanProceed(true);
+            }
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="w-full h-full flex flex-col items-center justify-center p-4 md:p-8"
+        >
+            <div className="max-w-4xl w-full h-full flex flex-col">
+                <div 
+                    ref={scrollContainerRef} 
+                    onScroll={handleScroll} 
+                    className="flex-1 overflow-y-auto p-8 md:p-12 bg-slate-800/40 border border-slate-700/50 rounded-xl backdrop-blur-sm custom-scrollbar"
+                >
+                    <h1 className="text-3xl md:text-4xl font-bold text-slate-100 tracking-tight">Human Made Certification</h1>
+                    <p className="mt-2 text-lg text-cyan-300 italic">The Organic Product of Technology.</p>
+                    
+                    <div className="mt-8 space-y-4 text-slate-300 text-base/relaxed">
+                        <p>
+                            In an age dominated by artificial intelligence, the <strong className="font-bold text-slate-100">Human Made</strong> seal represents a commitment to the most sincere human creativity. This certification is awarded to products of any kind: Works of art, products, services, and more. Any human creation free from even a minimal amount of artificial intelligence in the creative process.
+                        </p>
+                        <p>
+                            It demonstrates the value of the purely human touch, intention, and skill. From hand-crafted code to music, images, and emotions. The Human Made certification promotes a personal imperfection that only a human hand can possess.
+                        </p>
+                         <p>
+                            At Human Made, we believe that, while artificial intelligence is a powerful tool, human creation, experience, effort, and inspiration should be recognized irreplaceably. We plan to preserve and highlight these qualities, offering distinction to consumers and products, seeking authenticity in an environment saturated with content.
+                        </p>
+
+                        <h2 className="text-xl font-semibold text-slate-100 pt-4">Core Principles:</h2>
+                        <ul className="list-disc list-inside space-y-2 pl-4">
+                            <li>
+                                <span className="font-semibold text-cyan-400">Authenticity:</span> Verify conceptual and practical work, guided by human authors.
+                            </li>
+                            <li>
+                                <span className="font-semibold text-cyan-400">Craftsmanship:</span> Praise to human skill, time, experience, creation, and artistic flair.
+                            </li>
+                            <li>
+                                <span className="font-semibold text-cyan-400">Transparency:</span> Clarity of the tools used, ensuring human exclusivity in the production and creation of content.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div className="flex-shrink-0 mt-6 flex justify-center h-12">
+                    <AnimatePresence>
+                        {canProceed && (
+                            <motion.button 
+                                onClick={onCertified}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                transition={{ duration: 0.3 }}
+                                className="px-8 py-3 bg-cyan-500/80 text-slate-900 font-bold text-lg rounded-lg border border-cyan-400/50 shadow-lg shadow-cyan-500/10 hover:bg-cyan-500"
+                            >
+                                I am human.
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+const KeepInTouch = () => {
+    const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [lastMessageTimestamp, setLastMessageTimestamp] = useState(null);
+    const [timeLeft, setTimeLeft] = useState('');
+    const [isSentOrOnCooldown, setIsSentOrOnCooldown] = useState(false);
+    const messagesEndRef = useRef(null);
+
+    const MESSAGE_TIMESTAMP_KEY = 'humanmade_last_message_timestamp';
+    const MESSAGES_KEY = 'humanmade_messages';
+    const COOLDOWN_HOURS = 24;
+
+    useEffect(() => {
+        const storedTimestamp = localStorage.getItem(MESSAGE_TIMESTAMP_KEY);
+        if (storedTimestamp) {
+            const timestamp = parseInt(storedTimestamp, 10);
+            const now = new Date().getTime();
+            const cooldownEndTime = timestamp + COOLDOWN_HOURS * 60 * 60 * 1000;
+            
+            if (now < cooldownEndTime) {
+                setLastMessageTimestamp(timestamp);
+                setIsSentOrOnCooldown(true);
+            } else {
+                localStorage.removeItem(MESSAGE_TIMESTAMP_KEY);
+            }
+        }
+        const storedMessages = localStorage.getItem(MESSAGES_KEY);
+        if (storedMessages) {
+            setMessages(JSON.parse(storedMessages));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!lastMessageTimestamp) {
+            setTimeLeft('');
+            return;
+        }
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const cooldownEndTime = lastMessageTimestamp + COOLDOWN_HOURS * 60 * 60 * 1000;
+            const distance = cooldownEndTime - now;
+            if (distance < 0) {
+                setTimeLeft('');
+                setLastMessageTimestamp(null);
+                localStorage.removeItem(MESSAGE_TIMESTAMP_KEY);
+                setIsSentOrOnCooldown(false);
+                clearInterval(interval);
+                return;
+            }
+            const hours = Math.floor(distance / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [lastMessageTimestamp]);
+
+    useEffect(() => {
+        const simulateReplies = () => {
+            setMessages(currentMessages => {
+                let messagesChanged = false;
+                let newReplyText = null;
+                const updatedMessages = currentMessages.map(msg => {
+                    if (!msg.reply && (new Date().getTime() - msg.sentAt > 10000)) {
+                        messagesChanged = true;
+                         const cannedReplies = [
+                            "Thank you for your message. I've read it and I really appreciate you taking the time to write.",
+                            "I received your message. It's great to hear from you, thank you for sharing this with me.",
+                            "Got your message. Thank you for taking the time to connect. I'll keep your words in mind."
+                        ];
+                        const replyText = cannedReplies[Math.floor(Math.random() * cannedReplies.length)];
+                        newReplyText = replyText;
+                        return {
+                            ...msg,
+                            reply: {
+                                text: replyText,
+                                receivedAt: new Date().getTime() + (Math.random() * 2000 + 1000)
+                            }
+                        };
+                    }
+                    return msg;
+                });
+                
+                if (messagesChanged) {
+                    localStorage.setItem(MESSAGES_KEY, JSON.stringify(updatedMessages));
+                    if (newReplyText && typeof Notification !== 'undefined' && Notification.permission === 'granted' && document.hidden) {
+                        new Notification('You have a reply from HumanMade', {
+                            body: `"${newReplyText}"`,
+                            icon: '/vite.svg',
+                        });
+                    }
+                    return updatedMessages;
+                }
+                return currentMessages;
+            });
+        };
+        const interval = setInterval(simulateReplies, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages, isSentOrOnCooldown]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!message.trim() || isSentOrOnCooldown) return;
+        const now = new Date().getTime();
+        const newMessage = { id: now.toString(), text: message, sentAt: now };
+        setMessages(prev => {
+            const updated = [...prev, newMessage];
+            localStorage.setItem(MESSAGES_KEY, JSON.stringify(updated));
+            return updated;
+        });
+        localStorage.setItem(MESSAGE_TIMESTAMP_KEY, now.toString());
+        setLastMessageTimestamp(now);
+        setIsSentOrOnCooldown(true);
+        setMessage('');
+        if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    };
+    
+    return (
+        <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col w-full h-full bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden backdrop-blur-sm shadow-2xl"
+        >
+            <div className="p-4 border-b border-slate-700/50 flex items-center justify-between flex-shrink-0">
+                <h2 className="text-xl font-bold text-slate-100">Keep in Touch</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-2">
+                <AnimatePresence>
+                    {messages.length === 0 && !isSentOrOnCooldown && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-center text-slate-400 pt-10"
+                        >
+                            <p className="italic text-slate-300 mb-6 text-base/loose">The purpose of this space is to re-establish slow, human connection.</p>
+                            <p>You can send one message every 24 hours.</p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <AnimatePresence initial={false}>
+                    {messages.map((msg) => (
+                        <motion.div 
+                            key={msg.id}
+                            layout
+                            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                            className="space-y-4"
+                        >
+                            <div className="flex items-start gap-3 justify-end">
+                                <div className="max-w-xs rounded-xl px-4 py-3 bg-cyan-500/80 text-slate-900">
+                                    <p className="whitespace-pre-wrap">{msg.text}</p>
+                                    <p className="text-xs text-slate-800/70 text-right mt-1">{new Date(msg.sentAt).toLocaleString()}</p>
+                                </div>
+                            </div>
+                            {msg.reply && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3, duration: 0.4, ease: "easeOut" }}
+                                    className="flex items-start gap-3 justify-start"
+                                >
+                                     <div className="w-8 h-8 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-cyan-300 text-sm">
+                                        HM
+                                    </div>
+                                    <div className="max-w-xs rounded-xl px-4 py-3 bg-slate-700 text-slate-200">
+                                       <p className="whitespace-pre-wrap">{msg.reply.text}</p>
+                                       <p className="text-xs text-slate-400/70 text-right mt-1">{new Date(msg.reply.receivedAt).toLocaleString()}</p>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+                <div ref={messagesEndRef} />
+            </div>
+            <div className="p-4 border-t border-slate-700/50 flex-shrink-0">
+                { !isSentOrOnCooldown ? (
+                    <form onSubmit={handleSubmit} className="flex items-center gap-3">
+                        <input
+                            type="text"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="Write your message here..."
+                            className="flex-1 bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-shadow"
+                            aria-label="Your message"
+                        />
+                        <button 
+                            type="submit" 
+                            disabled={!message.trim()} 
+                            className="p-2.5 bg-cyan-500 rounded-lg text-slate-900 font-bold disabled:bg-slate-600 disabled:cursor-not-allowed hover:bg-cyan-400 transition-colors"
+                        >
+                            <SendIcon className="w-5 h-5" />
+                        </button>
+                    </form>
+                ) : (
+                    <div className="text-center">
+                        <h3 className="font-semibold text-cyan-300 mb-2">Thank you for your message!</h3>
+                        <p className="text-slate-400 text-sm mb-4">I'll reply soon. Enable notifications to stay in touch.</p>
+                        <div className="bg-slate-900/50 border border-slate-700 rounded-lg px-6 py-2 inline-block" aria-live="polite">
+                            <p className="text-slate-400 text-xs mb-1">Next message available in:</p>
+                            <p className="text-2xl font-mono font-bold text-slate-100 tracking-wider">{timeLeft || 'Loading...'}</p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </motion.div>
+    );
+};
+
+const BeHuman = () => {
+    const [grid, setGrid] = useState(null);
+    const [solved, setSolved] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [simulatedClick, setSimulatedClick] = useState(null);
+    const [startTime, setStartTime] = useState(null);
+    const [elapsedTime, setElapsedTime] = useState(0);
+    const [interactionCount, setInteractionCount] = useState(0);
+    const [cooldownTimestamp, setCooldownTimestamp] = useState(null);
+    const [timeLeft, setTimeLeft] = useState('');
+    const [completionStats, setCompletionStats] = useState(null);
+    const { t } = useTranslation();
+
+    const GRID_SIZE = 5;
+    const PATTERN = [[0, 0], [0, 1], [0, -1], [1, 0], [-1, 0]];
+    const COOLDOWN_KEY = 'humanmade_sync_cooldown_timestamp';
+    const COMPLETION_TIME_KEY = 'humanmade_sync_completion_time';
+    const PARTICIPANT_COUNT_KEY = 'humanmade_sync_participant_count';
+    const COOLDOWN_HOURS = 24;
+
+    const toggleConnections = (grid, row, col) => {
+        const newGrid = grid.map(r => [...r]);
+        PATTERN.forEach(([dr, dc]) => {
+            const r = row + dr;
+            const c = col + dc;
+            if (r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE) {
+                newGrid[r][c] = !newGrid[r][c];
+            }
+        });
+        return newGrid;
+    };
+
+    const isSolved = (grid) => grid.every(row => row.every(cell => cell === true));
+
+    const createPuzzle = () => {
+        let grid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(true));
+        const scrambleMoves = Math.floor(Math.random() * 5) + 5;
+        for (let i = 0; i < scrambleMoves; i++) {
+            const r = Math.floor(Math.random() * GRID_SIZE);
+            const c = Math.floor(Math.random() * GRID_SIZE);
+            grid = toggleConnections(grid, r, c);
+        }
+        if (isSolved(grid)) return createPuzzle();
+        return grid;
+    };
+
+    const formatTime = (ms) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+        return `${minutes}:${seconds}`;
+    };
+
+    const resetGame = useCallback(() => {
+        setGrid(createPuzzle());
+        setSolved(false);
+        setIsLoading(false);
+        setStartTime(Date.now());
+        setElapsedTime(0);
+        setInteractionCount(0);
+        setCooldownTimestamp(null);
+        setCompletionStats(null);
+        localStorage.removeItem(COOLDOWN_KEY);
+        localStorage.removeItem(COMPLETION_TIME_KEY);
+        localStorage.removeItem(PARTICIPANT_COUNT_KEY);
+    }, []);
+
+    const startCooldown = useCallback(() => {
+        const now = Date.now();
+        const finalTime = elapsedTime;
+        const finalCount = interactionCount;
+        localStorage.setItem(COOLDOWN_KEY, now.toString());
+        localStorage.setItem(COMPLETION_TIME_KEY, finalTime.toString());
+        localStorage.setItem(PARTICIPANT_COUNT_KEY, finalCount.toString());
+        setCooldownTimestamp(now);
+        setCompletionStats({ time: finalTime, count: finalCount });
+        setSolved(true);
+    }, [elapsedTime, interactionCount]);
+
+    useEffect(() => {
+        const storedTimestamp = localStorage.getItem(COOLDOWN_KEY);
+        if (storedTimestamp) {
+            const timestamp = parseInt(storedTimestamp, 10);
+            const now = Date.now();
+            const cooldownEndTime = timestamp + COOLDOWN_HOURS * 60 * 60 * 1000;
+            if (now < cooldownEndTime) {
+                setCooldownTimestamp(timestamp);
+                setGrid(Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(true)));
+                setSolved(true);
+                const storedTime = localStorage.getItem(COMPLETION_TIME_KEY);
+                const storedCount = localStorage.getItem(PARTICIPANT_COUNT_KEY);
+                if (storedTime && storedCount) {
+                    setCompletionStats({
+                        time: parseInt(storedTime, 10),
+                        count: parseInt(storedCount, 10)
+                    });
+                }
+            } else {
+                resetGame();
+            }
+        } else {
+            setGrid(createPuzzle());
+            setStartTime(Date.now());
+        }
+    }, [resetGame]);
+
+    useEffect(() => {
+        if (!cooldownTimestamp) {
+            setTimeLeft('');
+            return;
+        }
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const cooldownEndTime = cooldownTimestamp + COOLDOWN_HOURS * 60 * 60 * 1000;
+            const distance = cooldownEndTime - now;
+            if (distance < 0) {
+                setTimeLeft('');
+                clearInterval(interval);
+                resetGame();
+                return;
+            }
+            const hours = Math.floor(distance / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [cooldownTimestamp, resetGame]);
+
+    useEffect(() => {
+        if (solved || isLoading || cooldownTimestamp) return;
+        const simulateInteraction = () => {
+            setInteractionCount(prev => prev + 1);
+            setGrid(prevGrid => {
+                if (!prevGrid) return prevGrid;
+                const r = Math.floor(Math.random() * GRID_SIZE);
+                const c = Math.floor(Math.random() * GRID_SIZE);
+                setSimulatedClick({ r, c, id: Date.now() });
+                setTimeout(() => setSimulatedClick(null), 400);
+                return toggleConnections(prevGrid, r, c);
+            });
+        };
+        const intervalId = setInterval(simulateInteraction, Math.random() * 2000 + 2000);
+        return () => clearInterval(intervalId);
+    }, [solved, isLoading, cooldownTimestamp]);
+    
+    useEffect(() => {
+        if (solved || !startTime || cooldownTimestamp) return;
+        const timerId = setInterval(() => {
+            setElapsedTime(Date.now() - startTime);
+        }, 100);
+        return () => clearInterval(timerId);
+    }, [solved, startTime, cooldownTimestamp]);
+
+    useEffect(() => {
+        if (grid && !solved && isSolved(grid)) {
+            startCooldown();
+        }
+    }, [grid, solved, startCooldown]);
+
+    const handleCellClick = (row, col) => {
+        if (solved || isLoading || !grid || cooldownTimestamp) return;
+        setGrid(toggleConnections(grid, row, col));
+        setInteractionCount(prev => prev + 1);
+    };
+
+    const handleForceSync = async () => {
+        if (!grid || isLoading || solved || cooldownTimestamp) return;
+        setIsLoading(true);
+        setInteractionCount(prev => prev + 1);
+        try {
+            const solution = await solvePuzzle(grid);
+            let currentGrid = grid;
+            for (const move of solution) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                currentGrid = toggleConnections(currentGrid, move.row, move.col);
+                setGrid(currentGrid);
+            }
+        } catch (error) {
+            console.error("Failed to solve puzzle:", error);
+            const solvedGrid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(true));
+            setGrid(solvedGrid);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+        >
+            <div className="p-4 md:p-8">
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-100">{t('beHuman.title')}</h1>
+                        <p className="text-slate-400 mt-1">{t('beHuman.subtitle')}</p>
+                    </div>
+                </div>
+                <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
+                    <div className={`aspect-square p-2 bg-slate-900/50 border border-slate-700 rounded-lg ${cooldownTimestamp ? 'opacity-50' : ''}`}>
+                        <div className={`grid grid-cols-5 gap-1.5 md:gap-2`}>
+                            {grid?.map((rowArr, r) =>
+                                rowArr.map((cell, c) => (
+                                    <div key={`${r}-${c}`} className="relative">
+                                         <motion.button
+                                            onClick={() => handleCellClick(r, c)}
+                                            className={`w-12 h-12 md:w-16 md:h-16 rounded-md transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 focus-visible:ring-cyan-400 relative z-10`}
+                                            style={{
+                                                backgroundColor: cell ? '#22d3ee' : '#1e293b',
+                                                boxShadow: cell ? '0 0 15px #22d3ee, inset 0 0 5px rgba(255, 255, 255, 0.5)' : 'inset 0 2px 4px rgba(0,0,0,0.5)',
+                                            }}
+                                            whileTap={{ scale: solved || isLoading ? 1 : 0.9 }}
+                                            disabled={solved || isLoading || !!cooldownTimestamp}
+                                            aria-label={`Grid cell row ${r+1}, column ${c+1}. State: ${cell ? 'On' : 'Off'}`}
+                                        />
+                                        <AnimatePresence>
+                                        {simulatedClick?.r === r && simulatedClick?.c === c && (
+                                            <motion.div
+                                                key={simulatedClick.id}
+                                                className="absolute inset-0 rounded-md border-2 border-yellow-300 pointer-events-none"
+                                                initial={{ opacity: 1, scale: 0.8 }}
+                                                animate={{ opacity: 0, scale: 1.2 }}
+                                                transition={{ duration: 0.4, ease: "easeOut" }}
+                                            />
+                                        )}
+                                        </AnimatePresence>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                    <div className="w-full md:w-72 text-center flex flex-col items-center justify-center gap-6">
+                       <AnimatePresence mode="wait">
+                       {cooldownTimestamp ? (
+                           <motion.div
+                                key="cooldown"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                           >
+                                <h3 className="font-semibold text-2xl text-cyan-300 mb-2">{t('beHuman.solved.title')}</h3>
+                                <p className="text-slate-300 mb-4">{t('beHuman.solved.description')}</p>
+                                
+                                {completionStats && (
+                                    <div className="text-center text-slate-400 text-sm mb-4 space-y-1 bg-slate-900/30 p-3 rounded-lg border border-slate-700">
+                                        <p>{t('beHuman.solved.completionTime').replace('{time}', formatTime(completionStats.time))}</p>
+                                        <p>{t('beHuman.solved.participants').replace('{count}', completionStats.count.toString())}</p>
+                                    </div>
+                                )}
+                                
+                                <div className="bg-slate-900/50 border border-slate-700 rounded-lg px-6 py-2 inline-block" aria-live="polite">
+                                    <p className="text-slate-400 text-xs mb-1">{t('beHuman.cooldown.nextSync')}</p>
+                                    <p className="text-2xl font-mono font-bold text-slate-100 tracking-wider">{timeLeft || t('beHuman.cooldown.loading')}</p>
+                                </div>
+                           </motion.div>
+                       ) : (
+                           <motion.div key="playing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full">
+                               <div className="mb-6">
+                                    <p className="text-sm text-slate-400 uppercase tracking-widest">{t('beHuman.timerLabel')}</p>
+                                    <p className="text-4xl font-mono font-bold text-slate-100 tracking-wider mt-1">{formatTime(elapsedTime)}</p>
+                               </div>
+                               <button onClick={handleForceSync} disabled={isLoading} className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group">
+                                   <div className="relative w-5 h-5">
+                                       <AnimatePresence>
+                                       {isLoading ? (
+                                           <motion.div key="loader" className="absolute inset-0 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }}></motion.div>
+                                       ) : (
+                                           <motion.div key="icon" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }}>
+                                                <SyncIcon className="w-5 h-5 transform transition-transform group-hover:rotate-90" />
+                                           </motion.div>
+                                       )}
+                                       </AnimatePresence>
+                                   </div>
+                                   <span>{isLoading ? t('beHuman.forceSyncLoading') : t('beHuman.forceSync')}</span>
+                               </button>
+                           </motion.div>
+                       )}
+                       </AnimatePresence>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+const SurveyContent = () => {
+    return (
+        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-4">
+            <div 
+                className="w-8 h-8 border-4 border-slate-600 border-t-cyan-400 rounded-full animate-spin"
+                aria-label="Loading survey"
+            ></div>
+            <p className="text-lg">loading survey...</p>
+        </div>
+    );
+};
+
+const SurveyToast = ({ onStart, onDismiss }) => {
+    const toastVariants = {
+        hidden: { opacity: 0, y: 30, scale: 0.95 },
+        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+        exit: { opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.3, ease: 'easeIn' } },
+    };
+    return (
+        <motion.div
+            variants={toastVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-lg p-4 z-50"
+        >
+            <div className="bg-slate-800/70 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-5 flex items-center justify-between gap-4">
+                <div>
+                    <h3 className="font-bold text-slate-100">Help Improve HumanMade</h3>
+                    <p className="text-slate-400 text-sm mt-1">Take a short survey to share your feedback about this experience.</p>
+                </div>
+                <div className="flex-shrink-0 flex items-center gap-3">
+                     <button onClick={onDismiss} className="px-4 py-2 text-sm font-semibold text-slate-300 rounded-md hover:bg-slate-700/50 transition-colors">Maybe Later</button>
+                    <button onClick={onStart} className="px-4 py-2 text-sm font-bold text-slate-900 bg-cyan-400 rounded-md hover:bg-cyan-300 transition-colors">Start Survey</button>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+const SurveyWidget = ({ onOpen, onClose }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const widgetVariants = {
+        hidden: { opacity: 0, x: -30, scale: 0.95 },
+        visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+        exit: { opacity: 0, x: -20, scale: 0.95, transition: { duration: 0.3, ease: 'easeIn' } },
+    };
+    return (
+        <motion.div
+            variants={widgetVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed bottom-6 left-6 w-80 z-40"
+        >
+            <div 
+                className="bg-slate-800/60 backdrop-blur-md border border-slate-700 rounded-lg shadow-2xl overflow-hidden"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
+                <div className="h-10 flex items-center justify-between px-3 bg-slate-900/50">
+                    <div className="flex items-center gap-2">
+                        <ClipboardIcon className="w-4 h-4 text-cyan-300" />
+                        <span className="font-bold text-slate-200 text-sm">Active Surveys</span>
+                    </div>
+                     <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:bg-slate-700/50 hover:text-slate-100 transition-colors" aria-label="Close survey widget">
+                        <CloseIcon className="w-4 h-4" />
+                    </button>
+                </div>
+                <div className="p-4 cursor-pointer" onClick={onOpen}>
+                    <div className="flex items-center gap-3 text-slate-400">
+                        <div className="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse"></div>
+                        <span>loading survey...</span>
+                    </div>
+                </div>
+                 <AnimatePresence>
+                {isHovered && (
+                    <motion.div initial={{ height: 0 }} animate={{ height: '2px' }} exit={{ height: 0 }} className="bg-cyan-400" />
+                )}
+                </AnimatePresence>
+            </div>
+        </motion.div>
+    );
+};
+
+const useMediaQuery = (query) => {
+    const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+    useEffect(() => {
+        const media = window.matchMedia(query);
+        const listener = () => setMatches(media.matches);
+        media.addEventListener('change', listener);
+        return () => media.removeEventListener('change', listener);
+    }, [query]);
+    return matches;
+};
+
+const Window = ({ children, title, onClose, className = '' }) => {
+    const isMobile = useMediaQuery('(max-width: 768px)');
+    const dragProps = isMobile ? { drag: false } : { drag: true, dragMomentum: false, dragHandle: ".drag-handle" };
+    const windowVariants = {
+        hidden: { opacity: 0, scale: 0.9, y: 20 },
+        visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] } },
+        exit: { opacity: 0, scale: 0.9, y: 20, transition: { duration: 0.2, ease: "easeOut" } },
+    };
+    const mobileBackdropVariants = { hidden: { opacity: 0 }, visible: { opacity: 1 }, exit: { opacity: 0 } };
+    const mobileWindowVariants = {
+        hidden: { y: "100%" },
+        visible: { y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+        exit: { y: "100%", transition: { duration: 0.3, ease: "easeIn" } },
+    };
+
+    if (isMobile) {
+        return (
+            <motion.div
+                variants={mobileBackdropVariants} initial="hidden" animate="visible" exit="exit"
+                className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 flex items-end justify-center" onClick={onClose} >
+                <motion.div variants={mobileWindowVariants} className="w-full h-[90vh] bg-slate-800 border-t border-slate-700 rounded-t-2xl shadow-2xl z-50 flex flex-col" onClick={(e) => e.stopPropagation()} >
+                    <div className="h-14 flex-shrink-0 flex items-center justify-between px-4 rounded-t-2xl border-b border-slate-700">
+                        <span className="font-bold text-slate-200 text-lg">{title}</span>
+                        <button onClick={onClose} className="p-2 -mr-2 rounded-full text-slate-400 hover:bg-slate-700/50 hover:text-slate-100 transition-colors" aria-label="Close window">
+                            <CloseIcon className="w-6 h-6" />
+                        </button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+                        {children}
+                    </div>
+                </motion.div>
+            </motion.div>
+        )
+    }
+
+    return (
+        <motion.div
+            variants={windowVariants} initial="hidden" animate="visible" exit="exit" {...dragProps}
+            className={`bg-slate-800/60 backdrop-blur-md border border-slate-700 rounded-lg shadow-2xl z-30 flex flex-col ${className}`}
+            style={{ pointerEvents: 'auto' }}
+        >
+            <div className="drag-handle h-10 flex-shrink-0 flex items-center justify-between px-4 bg-slate-900/50 rounded-t-lg border-b border-slate-700 cursor-move">
+                <span className="font-bold text-slate-200">{title}</span>
+                <button onClick={onClose} className="p-1 rounded-full text-slate-400 hover:bg-slate-700/50 hover:text-slate-100 transition-colors" aria-label="Close window">
+                    <CloseIcon className="w-5 h-5" />
+                </button>
+            </div>
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                {children}
+            </div>
+        </motion.div>
+    );
+};
+
+
+const DesktopHub = () => {
+    const [isSyncOpen, setIsSyncOpen] = useState(false);
+    const [isKitOpen, setIsKitOpen] = useState(false);
+    const [isSurveyToastVisible, setIsSurveyToastVisible] = useState(false);
+    const [isSurveyWidgetVisible, setIsSurveyWidgetVisible] = useState(false);
+    const [isSurveyWindowOpen, setIsSurveyWindowOpen] = useState(false);
+
+    const SURVEY_INTERACTED_KEY = 'humanmade_survey_interacted';
+
+    useEffect(() => {
+        if (localStorage.getItem(SURVEY_INTERACTED_KEY)) {
+            if (localStorage.getItem(SURVEY_INTERACTED_KEY) === 'dismissed') {
+                setIsSurveyWidgetVisible(true);
+            }
+            return;
+        }
+        const timer = setTimeout(() => { setIsSurveyToastVisible(true); }, 4000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const handleStartSurvey = () => {
+        setIsSurveyToastVisible(false);
+        setIsSurveyWindowOpen(true);
+        localStorage.setItem(SURVEY_INTERACTED_KEY, 'started');
+    };
+
+    const handleDismissToast = () => {
+        setIsSurveyToastVisible(false);
+        setIsSurveyWidgetVisible(true);
+        localStorage.setItem(SURVEY_INTERACTED_KEY, 'dismissed');
+    };
+
+    const handleOpenSurveyFromWidget = () => {
+        setIsSurveyWidgetVisible(false);
+        setIsSurveyWindowOpen(true);
+    };
+    
+    const handleCloseSurveyWindow = () => {
+        setIsSurveyWindowOpen(false);
+        setIsSurveyWidgetVisible(true);
+    };
+
+    const DesktopIcon = ({ onClick, icon, label }) => (
+        <motion.button 
+            onClick={onClick}
+            className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-slate-700/50 transition-colors w-32 text-center"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+        >
+            <div className="p-4 bg-slate-800/60 rounded-lg border border-slate-700">
+                {icon}
+            </div>
+            <span className="text-slate-300 text-sm">{label}</span>
+        </motion.button>
+    );
+
+    return (
+        <motion.div className="relative w-full h-full p-4 md:p-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} >
+            <div className="space-y-4">
+                <DesktopIcon onClick={() => setIsSyncOpen(true)} icon={<SyncIcon className="w-8 h-8 text-cyan-300" />} label="Synchronize Connection" />
+                <DesktopIcon onClick={() => setIsKitOpen(true)} icon={<LetterIcon className="w-8 h-8 text-cyan-300" />} label="Keep in Touch" />
+            </div>
+            <AnimatePresence>
+                {isSyncOpen && (
+                    <Window title="Synchronize Connection" onClose={() => setIsSyncOpen(false)} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-auto max-w-[90vw] h-auto max-h-[80vh]">
+                        <BeHuman />
+                    </Window>
+                )}
+                {isKitOpen && (
+                    <Window title="Keep in Touch" onClose={() => setIsKitOpen(false)} className="absolute top-8 right-8 w-[400px] h-[640px]">
+                        <KeepInTouch />
+                    </Window>
+                )}
+                 {isSurveyWindowOpen && (
+                    <Window title="HumanMade Research Survey" onClose={handleCloseSurveyWindow} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px]">
+                        <SurveyContent />
+                    </Window>
+                )}
+            </AnimatePresence>
+            <AnimatePresence>
+                {isSurveyToastVisible && <SurveyToast onStart={handleStartSurvey} onDismiss={handleDismissToast} />}
+                {isSurveyWidgetVisible && <SurveyWidget onOpen={handleOpenSurveyFromWidget} onClose={() => setIsSurveyWidgetVisible(false)} />}
+            </AnimatePresence>
+        </motion.div>
+    );
+};
+
+//================================================================
+// MAIN APP COMPONENT
+//================================================================
+const App = () => {
+    const [isCertified, setIsCertified] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (localStorage.getItem('humanmade_certified') === 'true') {
+                setIsCertified(true);
+            }
+            setIsLoading(false);
+        }, 100);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const handleCertification = () => {
+        localStorage.setItem('humanmade_certified', 'true');
+        setIsCertified(true);
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-900 text-slate-200 antialiased selection:bg-cyan-300 selection:text-slate-900">
+            <div className="relative isolate min-h-screen overflow-hidden">
+                <div 
+                    className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"
+                >
+                    <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-cyan-400 opacity-20 blur-[100px]"></div>
+                </div>
+                <main className="h-screen w-screen">
+                     <AnimatePresence mode="wait">
+                        {isLoading ? (
+                            <div key="loader" className="w-full h-full flex items-center justify-center"></div>
+                        ) : isCertified ? (
+                           <DesktopHub key="hub" />
+                        ) : (
+                           <Certification key="certification" onCertified={handleCertification} />
+                        )}
+                    </AnimatePresence>
+                </main>
+            </div>
+        </div>
+    );
+};
+
+//================================================================
+// RENDER THE APP
+//================================================================
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Could not find root element to mount to");
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
+  </React.StrictMode>
+);
+
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
